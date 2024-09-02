@@ -83,7 +83,7 @@ impl<T: Sized + Copy> Queue<T> {
 
     /// Wait for an item to be available on the queue.
     pub fn receive(&self, max_wait: Duration) -> Result<T, FreeRtosError> {
-        let mut buff = unsafe { mem::zeroed::<T>() };
+        let mut buff = unsafe { core::mem::zeroed::<T>() };
 
         match unsafe {
             freertos_rs_queue_receive(
