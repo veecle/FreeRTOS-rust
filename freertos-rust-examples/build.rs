@@ -28,15 +28,7 @@ fn main() {
         }
     }
 
-    if target == "x86_64-unknown-linux-gnu" {
-        b.freertos_config("examples/linux");
-        b.freertos_port_base("freertos-addons/Linux/portable");
-
-        b.add_build_file("examples/linux/hooks.c");
-        // b.add_build_file("examples/linux/Run-time-stats-utils.c"); // Unimplemented yet..
-    }
-
-    if target == "aarch64-unknown-linux-gnu" {
+    if target == "x86_64-unknown-linux-gnu" || target == "aarch64-unknown-linux-gnu" {
         b.freertos_config("examples/linux");
         b.freertos_port_base("freertos-addons/Linux/portable");
 
