@@ -68,6 +68,7 @@ mod hooks;
 
 #[cfg(feature = "allocator")]
 mod allocator;
+mod async_utils;
 mod base;
 #[cfg(feature = "sync")]
 mod critical;
