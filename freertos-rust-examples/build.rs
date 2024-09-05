@@ -28,7 +28,7 @@ fn main() {
         }
     }
 
-    if target == "x86_64-unknown-linux-gnu" {
+    if target == "x86_64-unknown-linux-gnu" || target == "aarch64-unknown-linux-gnu" {
         b.freertos_config("examples/linux");
 
         b.add_build_file("examples/linux/hooks.c");
