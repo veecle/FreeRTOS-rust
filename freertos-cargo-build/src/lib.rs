@@ -193,7 +193,7 @@ impl Builder {
             target_env.as_str(),
         ) {
             (_, "x86_64", "windows", _) => "MSVC-MingW",
-            (_, "x86_64", "linux", "gnu") => "ThirdPartyGCC/Posix",
+            (_, "x86_64", "linux", "gnu") => "ThirdParty/GCC/Posix",
             (_, "aarch64", "linux", "gnu") => "ThirdParty/GCC/Posix",
             ("thumbv7m-none-eabi", _, _, _) => "GCC/ARM_CM3",
             ("thumbv7em-none-eabi", _, _, _) => "GCC/ARM_CM3", // M4 cores without FPU use M3
