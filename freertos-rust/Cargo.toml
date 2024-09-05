@@ -26,3 +26,9 @@ hooks = []
 interrupt = []
 cpu_clock = []
 delete_task = []
+
+[dependencies]
+atomic-waker = "1.1.2"
+
+
+

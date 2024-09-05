@@ -4,7 +4,8 @@ use core::marker::PhantomData;
 use core::mem::MaybeUninit;
 use core::task::Poll;
 
-use crate::async_utils;
+use atomic_waker::AtomicWaker;
+
 use crate::base::{
     freertos_rs_queue_create, freertos_rs_queue_delete, freertos_rs_queue_messages_waiting,
     freertos_rs_queue_receive, freertos_rs_queue_send, freertos_rs_queue_send_isr,
@@ -31,6 +32,8 @@ unsafe impl<T: Send + Sized> Sync for Queue<T> {}
 /// attribute.
 #[derive(Debug)]
 pub struct Queue<T: Send + Sized> {
+    send_waker: AtomicWaker,
+    receive_waker: AtomicWaker,
     queue: FreeRtosQueueHandle,
     item_type: PhantomData<T>,
 }
@@ -46,6 +49,8 @@ impl<T: Send + Sized> Queue<T> {
         }
 
         Ok(Queue {
+            send_waker: AtomicWaker::default(),
+            receive_waker: AtomicWaker::default(),
             queue: handle,
             item_type: PhantomData,
         })
@@ -69,6 +74,7 @@ impl<T: Send + Sized> Queue<T> {
         if ret != 0 {
             Err(FreeRtosError::QueueSendTimeout)
         } else {
+            self.receive_waker.wake();
             Ok(())
         }
     }
@@ -83,6 +89,7 @@ impl<T: Send + Sized> Queue<T> {
         if ret != 0 {
             Err(FreeRtosError::QueueFull)
         } else {
+            self.receive_waker.wake();
             Ok(())
         }
     }
@@ -96,9 +103,10 @@ impl<T: Send + Sized> Queue<T> {
             let ret = unsafe { freertos_rs_queue_send(self.queue, ptr, 0) };
 
             if ret == 0 {
+                self.receive_waker.wake();
                 Poll::Ready(())
             } else {
-                async_utils::register_queue_waker(self.queue as u32, cx.waker());
+                self.send_waker.register(cx.waker());
                 Poll::Pending
             }
         })
@@ -118,6 +126,7 @@ impl<T: Send + Sized> Queue<T> {
         if ret != 0 {
             Err(FreeRtosError::QueueReceiveTimeout)
         } else {
+            self.send_waker.wake();
             // # Safety
             // We checked the return value of `freertos_rs_queue_receive` so the element is initialized.
             Ok(unsafe { item.assume_init() })
@@ -134,11 +143,12 @@ impl<T: Send + Sized> Queue<T> {
             let ret = unsafe { freertos_rs_queue_receive(self.queue, ptr, 0) };
 
             if ret == 0 {
+                self.send_waker.wake();
                 // # Safety
                 // We checked the return value of `freertos_rs_queue_receive` so the element is initialized.
                 Poll::Ready(unsafe { item.assume_init() })
             } else {
-                async_utils::register_queue_waker(self.queue as u32, cx.waker());
+                self.receive_waker.register(cx.waker());
                 Poll::Pending
             }
         })
