@@ -103,11 +103,6 @@ extern "C" {
 /* Run time stats gathering configuration options. */
 unsigned long ulGetRunTimeCounterValue( void ); /* Prototype of function that returns run time counter. */
 #define configGENERATE_RUN_TIME_STATS			1
-/* Make use of times(man 2) to gather run-time statistics on the tasks. */
-extern void vPortFindTicksPerSecond( void );
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vPortFindTicksPerSecond()
-extern unsigned long ulPortGetTimerValue( void );
-#define portGET_RUN_TIME_COUNTER_VALUE() ulPortGetTimerValue()
 
 /* Co-routine related configuration options. */
 #define configUSE_CO_ROUTINES 					1
