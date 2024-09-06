@@ -153,7 +153,7 @@ impl Builder {
 
     /// Set the heap_?.c file to use from the "/portable/MemMang/" folder.
     /// heap_1.c ... heap_5.c (Default: heap_4.c)
-    /// see also: https://www.freertos.org/a00111.html
+    /// see also: <https://www.freertos.org/a00111.html>
     pub fn heap<P: AsRef<Path>>(&mut self, file_name: P) {
         self.heap_c = file_name.as_ref().to_path_buf();
     }
